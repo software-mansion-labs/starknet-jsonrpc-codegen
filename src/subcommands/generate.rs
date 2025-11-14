@@ -1785,7 +1785,7 @@ fn get_rust_type_for_field(schema: &Schema) -> Result<RustFieldType> {
 
 fn get_field_type_override(type_name: &str) -> Option<RustFieldType> {
     Some(match type_name {
-        "ADDRESS" | "STORAGE_KEY" | "TXN_HASH" | "FELT" | "BLOCK_HASH" | "CHAIN_ID"
+        "ADDRESS" | "TXN_HASH" | "FELT" | "BLOCK_HASH" | "CHAIN_ID"
         | "PROTOCOL_VERSION" => RustFieldType {
             type_name: String::from("Felt"),
             serializer: Some(SerializerOverride::SerdeAs(String::from("UfeHex"))),
