@@ -323,19 +323,7 @@
             "description": "Storage entries that were read during simulation: (contract_address, storage_key) -> value",
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "contract_address": {
-                  "$ref": "./api/starknet_api_openrpc.json#/components/schemas/ADDRESS"
-                },
-                "key": {
-                  "$ref": "./api/starknet_api_openrpc.json#/components/schemas/STORAGE_KEY"
-                },
-                "value": {
-                  "$ref": "#/components/schemas/FELT"
-                }
-              },
-              "required": ["contract_address", "key", "value"]
+              "$ref": "#/components/schemas/INITIAL_READS_STORAGE_ENTRY"
             }
           },
           "nonces": {
@@ -343,16 +331,7 @@
             "description": "Contract nonces that were read during simulation: contract_address -> nonce",
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "contract_address": {
-                  "$ref": "./api/starknet_api_openrpc.json#/components/schemas/ADDRESS"
-                },
-                "nonce": {
-                  "$ref": "#/components/schemas/FELT"
-                }
-              },
-              "required": ["contract_address", "nonce"]
+              "$ref": "#/components/schemas/INITIAL_READS_NONCE_ENTRY"
             }
           },
           "class_hashes": {
@@ -360,16 +339,7 @@
             "description": "Contract class hashes that were read during simulation: contract_address -> class_hash",
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "contract_address": {
-                  "$ref": "./api/starknet_api_openrpc.json#/components/schemas/ADDRESS"
-                },
-                "class_hash": {
-                  "$ref": "#/components/schemas/FELT"
-                }
-              },
-              "required": ["contract_address", "class_hash"]
+              "$ref": "#/components/schemas/INITIAL_READS_CLASS_HASH_ENTRY"
             }
           },
           "declared_contracts": {
@@ -377,19 +347,66 @@
             "description": "Class declaration status that was read during simulation: class_hash -> is_declared",
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "class_hash": {
-                  "$ref": "#/components/schemas/FELT"
-                },
-                "is_declared": {
-                  "type": "boolean"
-                }
-              },
-              "required": ["class_hash", "is_declared"]
+              "$ref": "#/components/schemas/INITIAL_READS_DECLARED_CONTRACT_ENTRY"
             }
           }
-        }
+        },
+        "required": []
+      },
+      "INITIAL_READS_STORAGE_ENTRY": {
+        "title": "Initial reads storage entry",
+        "type": "object",
+        "properties": {
+          "contract_address": {
+            "$ref": "./api/starknet_api_openrpc.json#/components/schemas/ADDRESS"
+          },
+          "key": {
+            "$ref": "./api/starknet_api_openrpc.json#/components/schemas/STORAGE_KEY"
+          },
+          "value": {
+            "$ref": "#/components/schemas/FELT"
+          }
+        },
+        "required": ["contract_address", "key", "value"]
+      },
+      "INITIAL_READS_NONCE_ENTRY": {
+        "title": "Initial reads nonce entry",
+        "type": "object",
+        "properties": {
+          "contract_address": {
+            "$ref": "./api/starknet_api_openrpc.json#/components/schemas/ADDRESS"
+          },
+          "nonce": {
+            "$ref": "#/components/schemas/FELT"
+          }
+        },
+        "required": ["contract_address", "nonce"]
+      },
+      "INITIAL_READS_CLASS_HASH_ENTRY": {
+        "title": "Initial reads class hash entry",
+        "type": "object",
+        "properties": {
+          "contract_address": {
+            "$ref": "./api/starknet_api_openrpc.json#/components/schemas/ADDRESS"
+          },
+          "class_hash": {
+            "$ref": "#/components/schemas/FELT"
+          }
+        },
+        "required": ["contract_address", "class_hash"]
+      },
+      "INITIAL_READS_DECLARED_CONTRACT_ENTRY": {
+        "title": "Initial reads declared contract entry",
+        "type": "object",
+        "properties": {
+          "class_hash": {
+            "$ref": "#/components/schemas/FELT"
+          },
+          "is_declared": {
+            "type": "boolean"
+          }
+        },
+        "required": ["class_hash", "is_declared"]
       },
       "SIMULATED_TRANSACTION": {
         "type": "object",

@@ -280,7 +280,7 @@ impl AdditionalDerivesOptions {
 fn main() {
     let cli = Cli::parse();
 
-    let profiles: [GenerationProfile; 10] = [
+    let profiles: [GenerationProfile; 11] = [
         GenerationProfile {
             version: SpecVersion::V0_1_0,
             raw_specs: RawSpecs {
