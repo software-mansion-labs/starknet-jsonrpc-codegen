@@ -178,6 +178,7 @@ impl Generate {
         println!("#![allow(clippy::wildcard_imports)]");
         println!("#![allow(clippy::unreadable_literal)]");
         println!("#![allow(clippy::collapsible_if)]");
+        println!("#![allow(clippy::use_self)]");
         println!("#![allow(unreachable_pub)]");
         println!();
         println!("use alloc::{{format, string::*, vec::*}};");
