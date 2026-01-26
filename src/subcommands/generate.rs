@@ -567,11 +567,23 @@ impl RustStruct {
                 Some(_) => {
                     println!("            {},", escape_name(&field.name))
                 }
-                None => println!(
-                    "            {}: &self.{},",
-                    escape_name(&field.name),
-                    escape_name(&field.name)
-                ),
+                None => {
+                    let uses_option_vec_serializer = matches!(
+                        &field.serializer,
+                        Some(SerializerOverride::SerdeAs(serializer))
+                            if serializer.starts_with("Option<Vec<")
+                    );
+                    let value = if field.optional && field.type_name.starts_with("Vec<") {
+                        if uses_option_vec_serializer {
+                            format!("self.{}.clone()", escape_name(&field.name))
+                        } else {
+                            format!("self.{}.as_deref()", escape_name(&field.name))
+                        }
+                    } else {
+                        format!("&self.{}", escape_name(&field.name))
+                    };
+                    println!("            {}: {value},", escape_name(&field.name));
+                }
             }
         }
 
@@ -1138,10 +1150,16 @@ impl RustField {
                 escape_name(&self.name)
             },
             if is_ref {
+                let uses_option_vec_serializer = matches!(
+                    &self.serializer,
+                    Some(SerializerOverride::SerdeAs(serializer)) if serializer.starts_with("Option<Vec<")
+                );
                 if type_name == "String" {
                     String::from("&'a str")
                 } else if type_name.starts_with("Vec<") {
-                    if self.optional && !is_wrapped_field {
+                    if self.optional && !is_wrapped_field && uses_option_vec_serializer {
+                        format!("Option<{type_name}>")
+                    } else if self.optional && !is_wrapped_field {
                         format!("Option<&'a [{}]>", &type_name[4..(type_name.len() - 1)])
                     } else {
                         format!("&'a [{}]", &type_name[4..(type_name.len() - 1)])
