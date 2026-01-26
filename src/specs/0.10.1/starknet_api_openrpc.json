@@ -2492,14 +2492,6 @@
                 "title": "Fee DA mode",
                 "description": "The storage domain of the account's balance from which fee will be charged",
                 "$ref": "#/components/schemas/DA_MODE"
-              },
-              "proof_facts": {
-                "title": "Proof facts",
-                "description": "Optional proof facts for the transaction",
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/FELT"
-                }
               }
             },
             "required": [
@@ -3030,6 +3022,14 @@
                 "title": "Fee DA mode",
                 "description": "The storage domain of the account's balance from which fee will be charged",
                 "$ref": "#/components/schemas/DA_MODE"
+              },
+              "proof_facts": {
+                "title": "Proof facts",
+                "description": "Optional proof facts for the transaction",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FELT"
+                }
               }
             },
             "required": [
