@@ -77,22 +77,7 @@
         "name": "simulated_transactions",
         "description": "The execution trace and consumed resources of the required transactions",
         "schema": {
-          "type": "object",
-          "properties": {
-            "simulated_transactions": {
-              "type": "array",
-              "description": "The execution trace and consumed resources of the required transactions",
-              "items": {
-                "$ref": "#/components/schemas/SIMULATED_TRANSACTION"
-              }
-            },
-            "initial_reads": {
-              "title": "Initial reads",
-              "description": "The set of state values fetched from the underlying state reader during execution for all transactions in the simulation. This provides a complete witness sufficient to reconstruct the cached state needed for re-execution. Only included when RETURN_INITIAL_READS is present in simulation_flags.",
-              "$ref": "#/components/schemas/INITIAL_READS"
-            }
-          },
-          "required": ["simulated_transactions"]
+          "$ref": "#/components/schemas/SIMULATE_TRANSACTIONS_RESULT"
         }
       },
       "errors": [
@@ -133,22 +118,7 @@
         "name": "traces",
         "description": "The traces of all transactions in the block",
         "schema": {
-          "type": "object",
-          "properties": {
-            "traces": {
-              "type": "array",
-              "description": "The traces of all transactions in the block",
-              "items": {
-                "$ref": "#/components/schemas/TRANSACTION_TRACE_WITH_HASH"
-              }
-            },
-            "initial_reads": {
-              "title": "Initial reads",
-              "description": "The set of state values fetched from the underlying state reader during execution for all transactions in the block. This provides a complete witness sufficient to reconstruct the cached state needed for re-execution. Only included when RETURN_INITIAL_READS is present in trace_flags.",
-              "$ref": "#/components/schemas/INITIAL_READS"
-            }
-          },
-          "required": ["traces"]
+          "$ref": "#/components/schemas/TRACE_BLOCK_TRANSACTIONS_RESULT"
         }
       },
       "errors": [
@@ -407,6 +377,44 @@
           }
         },
         "required": ["class_hash", "is_declared"]
+      },
+      "SIMULATE_TRANSACTIONS_RESULT": {
+        "title": "Simulate transactions result",
+        "type": "object",
+        "properties": {
+          "simulated_transactions": {
+            "type": "array",
+            "description": "The execution trace and consumed resources of the required transactions",
+            "items": {
+              "$ref": "#/components/schemas/SIMULATED_TRANSACTION"
+            }
+          },
+          "initial_reads": {
+            "title": "Initial reads",
+            "description": "The set of state values fetched from the underlying state reader during execution for all transactions in the simulation. This provides a complete witness sufficient to reconstruct the cached state needed for re-execution. Only included when RETURN_INITIAL_READS is present in simulation_flags.",
+            "$ref": "#/components/schemas/INITIAL_READS"
+          }
+        },
+        "required": ["simulated_transactions"]
+      },
+      "TRACE_BLOCK_TRANSACTIONS_RESULT": {
+        "title": "Trace block transactions result",
+        "type": "object",
+        "properties": {
+          "traces": {
+            "type": "array",
+            "description": "The traces of all transactions in the block",
+            "items": {
+              "$ref": "#/components/schemas/TRANSACTION_TRACE_WITH_HASH"
+            }
+          },
+          "initial_reads": {
+            "title": "Initial reads",
+            "description": "The set of state values fetched from the underlying state reader during execution for all transactions in the block. This provides a complete witness sufficient to reconstruct the cached state needed for re-execution. Only included when RETURN_INITIAL_READS is present in trace_flags.",
+            "$ref": "#/components/schemas/INITIAL_READS"
+          }
+        },
+        "required": ["traces"]
       },
       "SIMULATED_TRANSACTION": {
         "type": "object",
