@@ -175,6 +175,10 @@ impl Generate {
         println!("#![allow(missing_docs)]");
         println!("#![allow(clippy::doc_markdown)]");
         println!("#![allow(clippy::missing_const_for_fn)]");
+        println!("#![allow(clippy::wildcard_imports)]");
+        println!("#![allow(clippy::unreadable_literal)]");
+        println!("#![allow(clippy::collapsible_if)]");
+        println!("#![allow(unreachable_pub)]");
         println!();
         println!("use alloc::{{format, string::*, vec::*}};");
         println!();
