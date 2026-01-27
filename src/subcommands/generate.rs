@@ -132,6 +132,8 @@ impl Generate {
             .parse_full()
             .expect("Failed to parse specification");
 
+        println!("#![allow(clippy::collapsible_if)]");
+        println!("#![allow(clippy::unreadable_literal)]");
         println!("// AUTO-GENERATED CODE. DO NOT EDIT");
         println!("// To change the code generated, modify the codegen tool instead:");
         println!("//     https://github.com/xJonathanLEI/starknet-jsonrpc-codegen");
@@ -175,13 +177,8 @@ impl Generate {
         println!("#![allow(missing_docs)]");
         println!("#![allow(clippy::doc_markdown)]");
         println!("#![allow(clippy::missing_const_for_fn)]");
-        println!("#![allow(clippy::wildcard_imports)]");
-        println!("#![allow(clippy::unreadable_literal)]");
-        println!("#![allow(clippy::collapsible_if)]");
-        println!("#![allow(clippy::use_self)]");
-        println!("#![allow(unreachable_pub)]");
         println!();
-        println!("use alloc::{{format, string::*, vec::*}};");
+        println!("use alloc::{{format, string::String, vec::Vec}};");
         println!();
 
         println!("use indexmap::IndexMap;");
@@ -207,15 +204,20 @@ impl Generate {
         }
 
         println!("use super::{{");
+        println!("    AddressFilter, BlockId, BroadcastedTransaction, ConfirmedBlockId,");
+        println!("    ContractExecutionError,");
+        println!("    EthAddress, ExecuteInvocation, ExecutionResult, Felt, Hash256,");
+        println!("    LegacyContractAbiEntry, MerkleNode, ReceiptBlock, Transaction,");
+        println!("    TransactionContent, TransactionReceipt, TransactionStatus, TransactionTrace,");
+        println!("    UfeHex, alloc,");
         println!("    serde_impls::{{MerkleNodeMap, NumAsHex, OwnedContractExecutionError}},");
-        println!("    *,");
         println!("}};");
         println!();
 
         println!("#[cfg(target_has_atomic = \"ptr\")]");
-        println!("pub type OwnedPtr<T> = alloc::sync::Arc<T>;");
+        println!("pub(super) type OwnedPtr<T> = alloc::sync::Arc<T>;");
         println!("#[cfg(not(target_has_atomic = \"ptr\"))]");
-        println!("pub type OwnedPtr<T> = alloc::boxed::Box<T>;");
+        println!("pub(super) type OwnedPtr<T> = alloc::boxed::Box<T>;");
         println!();
         println!("#[cfg(feature = \"std\")]");
         println!("type RandomState = std::hash::RandomState;");
