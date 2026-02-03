@@ -36,12 +36,13 @@
         },
         {
           "name": "response_flags",
+          "description": "Flags that control what additional fields are included in the response",
+          "required": false,
           "schema": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TXN_RESPONSE_FLAG"
-            },
-            "default": []
+            }
           }
         }
       ],
@@ -83,12 +84,13 @@
         },
         {
           "name": "response_flags",
+          "description": "Flags that control what additional fields are included in the response",
+          "required": false,
           "schema": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TXN_RESPONSE_FLAG"
-            },
-            "default": []
+            }
           }
         }
       ],
@@ -126,6 +128,17 @@
           "schema": {
             "title": "Block id",
             "$ref": "#/components/schemas/BLOCK_ID"
+          }
+        },
+        {
+          "name": "response_flags",
+          "description": "Flags that control what additional fields are included in the response",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TXN_RESPONSE_FLAG"
+            }
           }
         }
       ],
