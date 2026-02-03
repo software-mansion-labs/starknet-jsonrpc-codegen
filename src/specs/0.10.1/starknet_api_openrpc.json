@@ -33,6 +33,16 @@
             "title": "Block id",
             "$ref": "#/components/schemas/BLOCK_ID"
           }
+        },
+        {
+          "name": "response_flags",
+          "schema": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TXN_RESPONSE_FLAG"
+            },
+            "default": []
+          }
         }
       ],
       "result": {
@@ -69,6 +79,16 @@
           "schema": {
             "title": "Block id",
             "$ref": "#/components/schemas/BLOCK_ID"
+          }
+        },
+        {
+          "name": "response_flags",
+          "schema": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TXN_RESPONSE_FLAG"
+            },
+            "default": []
           }
         }
       ],
