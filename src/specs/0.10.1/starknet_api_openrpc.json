@@ -33,17 +33,6 @@
             "title": "Block id",
             "$ref": "#/components/schemas/BLOCK_ID"
           }
-        },
-        {
-          "name": "response_flags",
-          "description": "Flags that control what additional fields are included in the response",
-          "required": false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TXN_RESPONSE_FLAG"
-            }
-          }
         }
       ],
       "result": {
@@ -267,17 +256,6 @@
             "title": "Transaction hash",
             "$ref": "#/components/schemas/TXN_HASH"
           }
-        },
-        {
-          "name": "response_flags",
-          "description": "Flags that control what additional fields are included in transaction responses",
-          "required": false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TXN_RESPONSE_FLAG"
-            }
-          }
         }
       ],
       "result": {
@@ -449,17 +427,6 @@
           "schema": {
             "title": "Transaction hash",
             "$ref": "#/components/schemas/TXN_HASH"
-          }
-        },
-        {
-          "name": "response_flags",
-          "description": "Flags that control what additional fields are included in the response",
-          "required": false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TXN_RESPONSE_FLAG"
-            }
           }
         }
       ],
