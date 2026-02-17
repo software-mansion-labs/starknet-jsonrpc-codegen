@@ -23,7 +23,6 @@ The following versions are supported:
 - `0.7.1`
 - `0.8.1`
 - `0.9.0`
-- `0.10.0`
 - `0.10.1`
 
 ## License
