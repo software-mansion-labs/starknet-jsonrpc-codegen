@@ -134,12 +134,12 @@ impl Generate {
 
         println!("// AUTO-GENERATED CODE. DO NOT EDIT");
         println!("// To change the code generated, modify the codegen tool instead:");
-        println!("//     https://github.com/xJonathanLEI/starknet-jsonrpc-codegen");
+        println!("//     https://github.com/software-mansion-labs/starknet-jsonrpc-codegen");
         println!();
         println!("// Code generated with version:");
         match built_info::GIT_COMMIT_HASH {
             Some(commit_hash) => println!(
-                "//     https://github.com/xJonathanLEI/starknet-jsonrpc-codegen#{commit_hash}"
+                "//     https://github.com/software-mansion-labs/starknet-jsonrpc-codegen#{commit_hash}"
             ),
             None => println!("    <Unable to determine Git commit hash>"),
         }
