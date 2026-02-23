@@ -132,6 +132,8 @@ impl Generate {
             .parse_full()
             .expect("Failed to parse specification");
 
+        println!("#![allow(clippy::collapsible_if)]");
+        println!("#![allow(clippy::unreadable_literal)]");
         println!("// AUTO-GENERATED CODE. DO NOT EDIT");
         println!("// To change the code generated, modify the codegen tool instead:");
         println!("//     https://github.com/software-mansion-labs/starknet-jsonrpc-codegen");
@@ -176,7 +178,7 @@ impl Generate {
         println!("#![allow(clippy::doc_markdown)]");
         println!("#![allow(clippy::missing_const_for_fn)]");
         println!();
-        println!("use alloc::{{format, string::*, vec::*}};");
+        println!("use alloc::{{format, string::String, vec::Vec}};");
         println!();
 
         println!("use indexmap::IndexMap;");
@@ -202,15 +204,20 @@ impl Generate {
         }
 
         println!("use super::{{");
+        println!("    AddressFilter, BlockId, BroadcastedTransaction, ConfirmedBlockId,");
+        println!("    ContractExecutionError,");
+        println!("    EthAddress, ExecuteInvocation, ExecutionResult, Felt, Hash256,");
+        println!("    LegacyContractAbiEntry, MerkleNode, ReceiptBlock, Transaction,");
+        println!("    TransactionContent, TransactionReceipt, TransactionStatus, TransactionTrace,");
+        println!("    UfeHex, alloc,");
         println!("    serde_impls::{{MerkleNodeMap, NumAsHex, OwnedContractExecutionError}},");
-        println!("    *,");
         println!("}};");
         println!();
 
         println!("#[cfg(target_has_atomic = \"ptr\")]");
-        println!("pub type OwnedPtr<T> = alloc::sync::Arc<T>;");
+        println!("pub(super) type OwnedPtr<T> = alloc::sync::Arc<T>;");
         println!("#[cfg(not(target_has_atomic = \"ptr\"))]");
-        println!("pub type OwnedPtr<T> = alloc::boxed::Box<T>;");
+        println!("pub(super) type OwnedPtr<T> = alloc::boxed::Box<T>;");
         println!();
         println!("#[cfg(feature = \"std\")]");
         println!("type RandomState = std::hash::RandomState;");
@@ -365,7 +372,7 @@ impl RustStruct {
                 print_doc(doc, 4);
             }
 
-            for line in field.def_lines(4, derive_serde, false, false, false) {
+            for line in field.def_lines(4, derive_serde, false, false, false, name) {
                 println!("{line}")
             }
         }
@@ -380,7 +387,7 @@ impl RustStruct {
             println!("pub struct {name}Ref<'a> {{");
 
             for field in fields.iter().filter(|field| field.fixed.is_none()) {
-                for line in field.def_lines(4, false, true, false, false) {
+                for line in field.def_lines(4, false, true, false, false, name) {
                     println!("{line}")
                 }
             }
@@ -460,7 +467,7 @@ impl RustStruct {
             println!("        #[derive(Serialize)]");
             println!("        #[serde(transparent)]");
             println!("        struct Field{ind_field}<'a> {{");
-            for line in field.def_lines(12, true, true, false, true).iter() {
+            for line in field.def_lines(12, true, true, false, true, name).iter() {
                 println!("{line}");
             }
             println!("        }}");
@@ -528,7 +535,7 @@ impl RustStruct {
         println!("        struct Tagged<'a> {{");
 
         for field in self.fields.iter() {
-            for line in field.def_lines(12, true, true, false, false).iter() {
+            for line in field.def_lines(12, true, true, false, false, name).iter() {
                 println!("{line}");
             }
         }
@@ -567,11 +574,23 @@ impl RustStruct {
                 Some(_) => {
                     println!("            {},", escape_name(&field.name))
                 }
-                None => println!(
-                    "            {}: &self.{},",
-                    escape_name(&field.name),
-                    escape_name(&field.name)
-                ),
+                None => {
+                    let uses_option_vec_serializer = matches!(
+                        &field.serializer,
+                        Some(SerializerOverride::SerdeAs(serializer))
+                            if serializer.starts_with("Option<Vec<")
+                    );
+                    let value = if field.optional && field.type_name.starts_with("Vec<") {
+                        if uses_option_vec_serializer {
+                            format!("self.{}.clone()", escape_name(&field.name))
+                        } else {
+                            format!("self.{}.as_deref()", escape_name(&field.name))
+                        }
+                    } else {
+                        format!("&self.{}", escape_name(&field.name))
+                    };
+                    println!("            {}: {value},", escape_name(&field.name));
+                }
             }
         }
 
@@ -610,7 +629,7 @@ impl RustStruct {
             println!("        #[derive(Deserialize)]");
             println!("        #[serde(transparent)]");
             println!("        struct Field{ind_field} {{");
-            for line in field.def_lines(12, true, false, false, true).iter() {
+            for line in field.def_lines(12, true, false, false, true, name).iter() {
                 println!("{line}");
             }
             println!("        }}");
@@ -734,8 +753,8 @@ impl RustStruct {
                     serde_flatten: field.serde_flatten,
                     serializer: field.serializer.as_ref().map(|value| value.to_optional()),
                 }
-                .def_lines(12, true, false, true, false),
-                None => field.def_lines(12, true, false, true, false),
+                .def_lines(12, true, false, true, false, name),
+                None => field.def_lines(12, true, false, true, false, name),
             };
 
             for line in lines.iter() {
@@ -1064,6 +1083,7 @@ impl RustField {
         is_ref: bool,
         no_arc_wrapping: bool,
         is_wrapped_field: bool,
+        parent_type_name: &str,
     ) -> Vec<String> {
         let mut lines = vec![];
 
@@ -1129,6 +1149,38 @@ impl RustField {
             &self.type_name
         };
 
+        let mut rendered_type = if is_ref {
+            let uses_option_vec_serializer = matches!(
+                &self.serializer,
+                Some(SerializerOverride::SerdeAs(serializer)) if serializer.starts_with("Option<Vec<")
+            );
+            if type_name == "String" {
+                String::from("&'a str")
+            } else if type_name.starts_with("Vec<") {
+                if self.optional && !is_wrapped_field && uses_option_vec_serializer {
+                    format!("Option<{type_name}>")
+                } else if self.optional && !is_wrapped_field {
+                    format!("Option<&'a [{}]>", &type_name[4..(type_name.len() - 1)])
+                } else {
+                    format!("&'a [{}]", &type_name[4..(type_name.len() - 1)])
+                }
+            } else if self.optional && !is_wrapped_field {
+                format!("&'a Option<{type_name}>")
+            } else {
+                format!("&'a {type_name}")
+            }
+        } else if self.arc_wrap && !no_arc_wrapping {
+            format!("OwnedPtr<{type_name}>")
+        } else if self.optional && !is_wrapped_field {
+            format!("Option<{type_name}>")
+        } else {
+            type_name.to_owned()
+        };
+
+        if !parent_type_name.is_empty() {
+            rendered_type = replace_self_type(&rendered_type, parent_type_name);
+        }
+
         lines.push(format!(
             "{}pub {}: {},",
             leading_spaces,
@@ -1137,27 +1189,7 @@ impl RustField {
             } else {
                 escape_name(&self.name)
             },
-            if is_ref {
-                if type_name == "String" {
-                    String::from("&'a str")
-                } else if type_name.starts_with("Vec<") {
-                    if self.optional && !is_wrapped_field {
-                        format!("Option<&'a [{}]>", &type_name[4..(type_name.len() - 1)])
-                    } else {
-                        format!("&'a [{}]", &type_name[4..(type_name.len() - 1)])
-                    }
-                } else if self.optional && !is_wrapped_field {
-                    format!("&'a Option<{type_name}>")
-                } else {
-                    format!("&'a {type_name}")
-                }
-            } else if self.arc_wrap && !no_arc_wrapping {
-                format!("OwnedPtr<{type_name}>")
-            } else if self.optional && !is_wrapped_field {
-                format!("Option<{type_name}>")
-            } else {
-                type_name.to_owned()
-            },
+            rendered_type,
         ));
 
         lines
@@ -1870,6 +1902,37 @@ fn get_all_of_ref_name_override(type_name: &str) -> Option<String> {
         "RECEIPT_BLOCK" => Some("block".into()),
         _ => None,
     }
+}
+
+fn replace_self_type(input: &str, type_name: &str) -> String {
+    let mut out = String::with_capacity(input.len());
+    let mut token = String::new();
+
+    for ch in input.chars() {
+        if ch.is_alphanumeric() || ch == '_' {
+            token.push(ch);
+        } else {
+            if !token.is_empty() {
+                if token == type_name {
+                    out.push_str("Self");
+                } else {
+                    out.push_str(&token);
+                }
+                token.clear();
+            }
+            out.push(ch);
+        }
+    }
+
+    if !token.is_empty() {
+        if token == type_name {
+            out.push_str("Self");
+        } else {
+            out.push_str(&token);
+        }
+    }
+
+    out
 }
 
 fn print_doc(doc: &str, indent_spaces: usize) {
