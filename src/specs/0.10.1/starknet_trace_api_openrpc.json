@@ -654,10 +654,16 @@
         "description": "Extra information on why trace is not available. Either it wasn't executed yet (RECEIVED), or the transaction failed (REJECTED)",
         "properties": {
           "status": {
-            "$ref": "./api/starknet_api_openrpc.json#/components/schemas/TXN_STATUS"
+            "$ref": "#/components/schemas/NO_TRACE_AVAILABLE_STATUS"
           }
         },
         "required": ["status"]
+      },
+      "NO_TRACE_AVAILABLE_STATUS": {
+        "title": "No trace available status",
+        "type": "string",
+        "enum": ["RECEIVED", "REJECTED"],
+        "description": "Transaction status explaining why the trace is not available"
       }
     },
     "errors": {
