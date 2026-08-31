@@ -905,17 +905,20 @@ impl RustEnum {
             println!("        match self {{");
 
             for variant in self.variants.iter() {
-                println!(
-                    "            Self::{}{} => write!(f, \"{}{}\"),",
-                    variant.name,
-                    if variant.wraps.is_some() { "(e)" } else { "" },
-                    variant.name,
-                    if variant.wraps.is_some() {
-                        ": {e:?}"
-                    } else {
-                        ""
-                    },
-                );
+                match &variant.wraps {
+                    Some(inner) if inner.type_name == "String" => println!(
+                        "            Self::{}(e) => write!(f, \"{{}}: {{e}}\", self.message()),",
+                        variant.name
+                    ),
+                    Some(_) => println!(
+                        "            Self::{}(e) => write!(f, \"{{}}: {{e:?}}\", self.message()),",
+                        variant.name
+                    ),
+                    None => println!(
+                        "            Self::{} => f.write_str(self.message()),",
+                        variant.name
+                    ),
+                }
             }
 
             println!("        }}");
