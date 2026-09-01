@@ -900,6 +900,7 @@ impl RustEnum {
             println!("impl std::error::Error for {name} {{}}");
 
             println!();
+            println!("#[allow(clippy::match_same_arms)]");
             println!("impl core::fmt::Display for {name} {{");
             println!("    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {{");
             println!("        match self {{");
